@@ -12,11 +12,11 @@ ret, first_frame = cap.read()
 
 # setup initial location of window
 #track_window = [topLeftX, topLeftY, width, height]
-select = cv2.selectROI("Select object", first_frame, False)
+trackWindow = cv2.selectROI("Select object", first_frame, False)
 
 # set up the ROI for tracking
-roi = first_frame[int(select[1]):int(select[1]+select[3]), 
-                      int(select[0]):int(select[0]+select[2])]
+roi = first_frame[int(trackWindow[1]):int(trackWindow[1]+trackWindow[3]), 
+                      int(trackWindow[0]):int(trackWindow[0]+trackWindow[2])]
 hsv_roi =  cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 mask = cv2.inRange(hsv_roi, np.array((0., 60.,32.)), np.array((180.,255.,255.)))
 roi_hist = cv2.calcHist([hsv_roi],[0],mask,[180],[0,180])
