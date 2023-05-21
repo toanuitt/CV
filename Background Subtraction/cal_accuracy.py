@@ -5,24 +5,18 @@ import numpy as np
 
 class EuclideanDistTracker:
     def __init__(self):
-        # Store the center positions of the objects
         self.center_points = {}
-        # Keep the count of the IDs
-        # each time a new object id detected, the count will increase by one
         self.id_count = 0
 
 
     def update(self, objects_rect):
-        # Objects boxes and ids
         objects_bbs_ids = []
 
-        # Get center point of new object
         for rect in objects_rect:
             x, y, w, h = rect
             cx = (x + x + w) // 2
             cy = (y + y + h) // 2
 
-            # Find out if that object was detected already
             same_object_detected = False
             for id, pt in self.center_points.items():
                 dist = math.hypot(cx - pt[0], cy - pt[1])
@@ -33,43 +27,35 @@ class EuclideanDistTracker:
                     same_object_detected = True
                     break
 
-            # New object is detected we assign the ID to that object
             if same_object_detected is False:
                 self.center_points[self.id_count] = (cx, cy)
                 objects_bbs_ids.append([x, y, w, h, self.id_count])
                 self.id_count += 1
 
-        # Clean the dictionary by center points to remove IDS not used anymore
         new_center_points = {}
         for obj_bb_id in objects_bbs_ids:
             _, _, _, _, object_id = obj_bb_id
             center = self.center_points[object_id]
             new_center_points[object_id] = center
 
-        # Update dictionary with IDs not used removed
         self.center_points = new_center_points.copy()
         return objects_bbs_ids
 
 
 def calculate_iou(box1, box2):
-    # Tính toán tọa độ các góc của hai bounding box
     x1, y1, x2, y2 = box1
     x3, y3, x4, y4 = box2
 
-    # Tính toán tọa độ các góc của hình vuông giao nhau (intersection)
     x_inter1 = max(x1, x3)
     y_inter1 = max(y1, y3)
     x_inter2 = min(x2, x4)
     y_inter2 = min(y2, y4)
 
-    # Tính toán diện tích của hình vuông giao nhau (intersection)
     intersection_area = max(0, abs(x_inter2 - x_inter1 + 1)) * max(0, abs(y_inter2 - y_inter1 + 1))
 
-    # Tính toán diện tích của hai bounding box
     box1_area = (x2 - x1 + 1) * (y2 - y1 + 1)
     box2_area = (x4 - x3 + 1) * (y4 - y3 + 1)
 
-    # Tính toán độ đo IoU
     iou = intersection_area / float(box1_area + box2_area - intersection_area)
 
     return iou
